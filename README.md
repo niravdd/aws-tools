@@ -3,13 +3,13 @@ Tools written to help with specific use-cases to augment AWS services & their us
 
 ## efs-userdata-mount
 * _**Service**_: **Amazon Elastic File System (EFS)**
-* _**Use-case**_: The Amazon EFS service provides you with a DNS name/endpoint to mount your volume on a Amazon EC2 instance. The service documentation also guides you to mount the volume on on-premises servers with a DNS name. You need to update their on-premises DNS server to forward the DNS requests for Amazon EFS mount targets to a DNS server in the Amazon VPC over the AWS Direct Connect connection.
+* _**Use-case**_: The Amazon EFS service provides you with a DNS name/endpoint to mount your EFS volume on a Amazon EC2 instance. The service documentation also guides you to mount the volume on on-premises servers with a DNS name. You need to update your on-premises DNS server to forward the DNS requests for Amazon EFS mount targets to a DNS server in the Amazon VPC over the AWS Direct Connect/VPN connection.
 
-    However, if you are unable to setup the DNS entries or the DNS forwarding _(for whatever reasons)_ you have to perform the mount using the EFS mount target IP Address specific to the AZ where your EC2 instance is running. Amazon EFS provides you with different mount target IP addresses, specific to each AZ in a region. This would not work if you need instances launched by an Auto-Scaling Group (ASG) to mount the volume via their AZ's mount target IP Address, at startup.
+    However, if you are unable to setup the DNS entries or the DNS forwarding _(for whatever reasons)_ you have to perform the mount using the EFS mount target IP Address specific to the AZ where your EC2 instance is running. Amazon EFS provides you with mount target IP addresses, specific to each AZ in a region - you can use them to mount the volumes manually. This would not work if you need instances launched by an Auto-Scaling Group (ASG) to intelligently mount the volume via your AZ's mount target IP Address, at startup.
 
-    This bash script can be help in such cases, to mount the volume via the IP address. The script identifies the AZ hosting the EC2 instance and mounts the volume using the appropriate mount target IP address for the AZ.
+    This bash script can help for such a use-case. The script identifies the AZ hosting the EC2 instance and mounts the volume using the appropriate mount target IP address for the AZ.
 
-* _**Usage**_:
+* _**Usage**_: Customers prefer to build their AMI with this script and then invoke it from the EC2 instance's userdata (independently or as part of a launch configuration for an ASG).
 ```
 Syntax: ./efs-userdata-mount <EFS file-system-id> <preferred mount point> [ boot / debug ]
         ./efs-userdata-mount help
