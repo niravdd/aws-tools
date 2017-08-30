@@ -1,5 +1,5 @@
 #!/bin/bash
-#########################################################################
+############################################################################
 # Copyright 2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You
@@ -12,7 +12,7 @@
 # distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
-##########################################################################
+############################################################################
 #
 # Script: efs-userdata-mount
 # Use Case: When not using the VPC's default DNS, if you cannot setup DNS entry/forwarding for whatever reasons, you can use this tool to mount your EFS Volume via the appropriate mount target.
@@ -22,7 +22,7 @@
 # TODO:
 # 1. Use AWS-CLI --query to filter & extract instead of awk. Issue storing the results to the array as individual elements yet, so pending.
 #
-##########################################################################
+############################################################################
 
 if [ "$1" = "" ] || [ "$2" = "" ] || [ "$1" = "help" ] || [ "$2" = "help" ] || [ "$1" = "debug" ] || [ "$2" = "debug" ] || [ "$1" = "boot" ] || [ "$2" = "boot" ]; then
     echo "Syntax: ./efs-userdata-mount <EFS file-system-id> <preferred mount point> [ boot / debug ]"
@@ -50,20 +50,20 @@ preferredMountPoint=$2
 if [ ! -d "$preferredMountPoint" ]; then
    read -p "$preferredMountPoint does not exist. Do you want this script to create it? [Y/N]: " userResponse
    if [ "$userResponse" = 'Y' ] || [ "$userResponse" = 'y' ]; then
-   	    mkdir -p $preferredMountPoint
-   	    errorCode=$?
-   	    if [ $errorCode -eq 0 ]; then
+        mkdir -p $preferredMountPoint
+        errorCode=$?
+        if [ $errorCode -eq 0 ]; then
             if [ "$3" = "debug" ]; then
-   	    	    echo "*Debug* Created the preferred mount point directory... Proceeding..."
-   	    	fi
-   	    else
-   	    	echo "ERROR: mkdir $preferredMountPoint failed. [Exit Status: $errorCode]"
-  	        echo "ABORTED: Cannot proceed without a valid mount point."
-   	        exit 1
-   	    fi
+              echo "*Debug* Created the preferred mount point directory... Proceeding..."
+          fi
+        else
+          echo "ERROR: mkdir $preferredMountPoint failed. [Exit Status: $errorCode]"
+            echo "ABORTED: Cannot proceed without a valid mount point."
+            exit 1
+        fi
    else
-   	    echo "ABORTED: Cannot proceed without a valid mount point."
-   	    exit 1
+        echo "ABORTED: Cannot proceed without a valid mount point."
+        exit 1
    fi
 fi
 
@@ -95,7 +95,7 @@ fi
 azCounter=0
 for az in "${availabilityZones[@]}"
 do
-	if [ "$3" = "debug" ]; then
+  if [ "$3" = "debug" ]; then
         echo "*Debug* Checking if instance's AZ [$currentAZ] and [$az] match..."
     fi
     if [ "$currentAZ" = "$az" ]; then
@@ -108,9 +108,9 @@ do
             errorCode=$?
         fi
         if [ $errorCode -eq 0 ]; then
-   	       echo "SUCCESS: EFS Volume was mounted successfully! Access it via the [ $preferredMountPoint ]."
+           echo "SUCCESS: EFS Volume was mounted successfully! Access it via the [ $preferredMountPoint ]."
            if [ "$3" != "boot" ]; then
-   	           echo "Tip: You may now want to include 'boot' as the third parameter to this tool to add the mount target to the /etc/fstab."
+               echo "Tip: You may now want to include 'boot' as the third parameter to this tool to add the mount target to the /etc/fstab."
            fi
         else
             echo "ERROR: There was an error with the request to mount the volume."
@@ -119,12 +119,32 @@ do
             fi
         fi
         if [ "$3" = "boot" ]; then
-        	# Assuming "debug" is enabled for "boot - verbose..."
-        	  echo "*Debug* Adding entry to the /etc/fstab..."
-        	  echo "*Debug* [ == ${efsMountPoints[$azCounter]}:/ $preferredMountPoint nfs defaults 0 0 == ]"
+          # Assuming "debug" is enabled for "boot - verbose..."
+            echo "*Debug* Adding entry to the /etc/fstab..."
+            echo "*Debug* [ == ${efsMountPoints[$azCounter]}:/ $preferredMountPoint nfs defaults 0 0 == ]"
             echo "${efsMountPoints[$azCounter]}:/ $preferredMountPoint nfs defaults 0 0" >> /etc/fstab
         fi
     fi
     azCounter=`expr $azCounter + 1`
 done
 
+
+# aws efs describe-mount-targets --file-system-id fs-8c2acab5 --query 'MountTargets[].IpAddress' --output text
+# aws efs describe-mount-targets --file-system-id fs-8c2acab5 --query 'MountTargets[].SubnetId' --output text
+
+# $(aws ec2 describe-subnets --subnet-ids $(aws efs describe-mount-targets --file-system-id fs-8c2acab5 | awk '/SubnetId/{print substr($2, 2, length($2) - 3)}' | awk 'NR==1') | awk '/AvailabilityZone/{print substr($2, 2, length($2) - 3)}') ]; then
+
+# aws ec2 describe-subnets --subnet-ids $(aws efs describe-mount-targets --file-system-id fs-8c2acab5 | awk '/SubnetId/{print substr($2, 2, length($2) - 3)}' | awk 'NR==1') | awk '/AvailabilityZone/{print substr($2, 2, length($2) - 3)}')
+
+
+#     echo "$"
+# if [ $(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone) = $(aws ec2 describe-subnets --subnet-ids $(aws efs describe-mount-targets --file-system-id fs-8c2acab5 | awk '/SubnetId/{print substr($2, 2, length($2) - 3)}' | awk 'NR==2') | awk '/AvailabilityZone/{print substr($2, 2, length($2) - 3)}') ]; then
+#     echo "$"
+# if [ $(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone) = $(aws ec2 describe-subnets --subnet-ids $(aws efs describe-mount-targets --file-system-id fs-8c2acab5 | awk '/SubnetId/{print substr($2, 2, length($2) - 3)}' | awk 'NR==2') | awk '/AvailabilityZone/{print substr($2, 2, length($2) - 3)}') ]; then
+
+
+# aws ec2 describe-subnets --subnet-ids $(aws efs describe-mount-targets --file-system-id fs-8c2acab5 | awk '/SubnetId/{print substr($2, 2, length($2) - 3)}' | awk 'NR==1') | awk '/AvailabilityZone/{print substr($2, 2, length($2) - 3)}'
+
+
+# 1. aws ec2 describe-subnets --region ap-southeast-2 --subnet-ids $(aws efs describe-mount-targets --region ap-southeast-2 --file-system-id fs-8c2acab5 | awk '/SubnetId/{print substr($2, 2, length($2) - 3)}') | awk '/AvailabilityZone/{print substr($2, 2, length($2) - 3)}'
+# 2. aws efs describe-mount-targets --file-system-id fs-8c2acab5 | awk '/IpAddress/{print substr($2, 2, length($2) - 3)}' | awk 'NR==1'
