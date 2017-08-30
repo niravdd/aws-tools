@@ -11,7 +11,7 @@ Tools written to help with specific use-cases to augment AWS services & their us
 
 * _Pre-requisites_: The EC2 instance should be launched in the same VPC as the EFS volume & in one of the subnets where the EFS Volume has mount targets.
 
-   1. Create/Update an IAM role to allow the following permissions at minimum. Fine tune the policy, as needed. Attach the IAM Role to the instance (if its running without an ASG) or in the launch-config for the ASG.
+   a. Create/Update an IAM role to allow the following permissions at minimum. Fine tune the policy, as needed. Attach the IAM Role to the instance (if its running without an ASG) or in the launch-config for the ASG.
 
 >		{
 >		    "Version": "2012-10-17",
@@ -27,6 +27,6 @@ Tools written to help with specific use-cases to augment AWS services & their us
 >		    ]
 >		}
 
-   2. The EFS Volume security group should allow TCP connections to port 2049 (NFS) from your preferred range of IP addresses.
+   b. The EFS Volume security group should allow TCP connections to port 2049 (NFS) from your preferred range of IP addresses.
 
 ## TBD
