@@ -1,2 +1,2 @@
 # aws-tools
-Tools to augment AWS services &amp; their usage
+Tools to augment AWS services &amp; their use
