@@ -9,6 +9,7 @@ Tools written to help with specific use-cases to augment AWS services & their us
 
     This bash script can be help in such cases, to mount the volume via the IP address. The script identifies the AZ hosting the EC2 instance and mounts the volume using the appropriate mount target IP address for the AZ.
 
+
 * _**Usage**_:
 ```
 Syntax: ./efs-userdata-mount <EFS file-system-id> <preferred mount point> [ boot / debug ]
