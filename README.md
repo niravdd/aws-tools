@@ -10,9 +10,9 @@ Tools written to help with specific use-cases to augment AWS services & their us
 
      This bash script can be help in such cases, to mount the volume via the IP address. The script identifies the AZ hosting the EC2 instance and mounts the volume using the appropriate mount target IP address for the AZ.
 
-     * _Pre-requisites_: The EC2 instance should run with an appropriate role which can do the following (at minimum).
+     * _Pre-requisites_: The EC2 instance should be launched in the same VPC as the EFS volume & in one of the subnets where the EFS Volume has mount targets.
 
-         1. Create/Update an IAM role to allow the following permissions at minimum. Fine tune the policy, as needed. Attach the IAM Role with the instance (if its running out of an ASG) or the launch-config for the ASG.
+         1. Create/Update an IAM role to allow the following permissions at minimum. Fine tune the policy, as needed. Attach the IAM Role to the instance (if its running without an ASG) or in the launch-config for the ASG.
 ```
 		{
 		    "Version": "2012-10-17",
